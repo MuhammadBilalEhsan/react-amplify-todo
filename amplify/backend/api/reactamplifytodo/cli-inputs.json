@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "reactamplifytodo",
+    "serviceName": "AppSync",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 365,
+      "apiKeyExpirationDate": "2024-02-03T14:52:07.168Z",
+      "keyDescription": ""
+    },
+    "conflictResolution": {},
+    "additionalAuthTypes": []
+  }
+}

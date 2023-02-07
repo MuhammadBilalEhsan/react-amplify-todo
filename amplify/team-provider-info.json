@@ -1,0 +1,32 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-reactamplifytodo-dev-185249-authRole",
+      "UnauthRoleArn": "arn:aws:iam::182502766709:role/amplify-reactamplifytodo-dev-185249-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::182502766709:role/amplify-reactamplifytodo-dev-185249-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-reactamplifytodo-dev-185249-deployment",
+      "UnauthRoleName": "amplify-reactamplifytodo-dev-185249-unauthRole",
+      "StackName": "amplify-reactamplifytodo-dev-185249",
+      "StackId": "arn:aws:cloudformation:us-east-1:182502766709:stack/amplify-reactamplifytodo-dev-185249/0e59a270-a3ca-11ed-8914-0eb832199ad3",
+      "AmplifyAppId": "d2pksmmgcp45dk"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d2pksmmgcp45dk",
+          "type": "manual"
+        }
+      },
+      "auth": {
+        "reactamplifytodoabbe272d": {}
+      },
+      "function": {
+        "todo": {
+          "deploymentBucketName": "amplify-reactamplifytodo-dev-185249-deployment",
+          "s3Key": "amplify-builds/todo-793957427a594d5a6843-build.zip"
+        }
+      }
+    }
+  }
+}
