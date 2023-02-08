@@ -1,20 +1,20 @@
 /* src/App.js */
 import { Loader, withAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { Amplify, API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import { createTodo, updateTodo } from "./graphql/mutations";
 import { listTodos } from "./graphql/queries";
 
-import awsExports from "./aws-exports";
+// import awsExports from "./aws-exports";
 import "./App.css";
-import Item from "./Item";
 import {
   onCreateTodo,
   onDeleteTodo,
   onUpdateTodo,
 } from "./graphql/subscriptions";
-Amplify.configure(awsExports);
+import Item from "./Item";
+// Amplify.configure(awsExports);
 
 const initialState = {
   id: "",
@@ -102,29 +102,46 @@ const App = ({ signOut, user }) => {
       let onUpdateTodoSubs;
 
       onCreateTodoSubs = API.graphql(
-        graphqlOperation(onCreateTodo, { filter: { userId: { eq: sub } } })
+        graphqlOperation(
+          onCreateTodo
+          //  { filter: { userId: { eq: sub } } }
+        )
       ).subscribe({
         next: ({ provider, value }) => {
-          console.log("value", value);
-          setTodos((prev) => [...prev, value.data.onCreateTodo]);
+          let data = value.data.onCreateTodo;
+          if (data.userId === sub) {
+            setTodos((prev) => [...prev, data]);
+          }
         },
         error: (error) => console.warn(error),
       });
       onUpdateTodoSubs = API.graphql(
-        graphqlOperation(onUpdateTodo, { filter: { userId: { eq: sub } } })
+        graphqlOperation(
+          onUpdateTodo
+          //  { filter: { userId: { eq: sub } } }
+        )
       ).subscribe({
         next: ({ provider, value }) => {
-          console.log("value", value);
-          // setTodos((prev) => [...prev, value.data.onUpdateTodo]);
+          let data = value.data.onUpdateTodo;
+          if (data.userId === sub) {
+            setTodos((prev) =>
+              prev.map((item) => (item.id === data.id ? data : item))
+            );
+          }
         },
         error: (error) => console.warn(error),
       });
       onDeleteTodoSubs = API.graphql(
-        graphqlOperation(onDeleteTodo, { filter: { userId: { eq: sub } } })
+        graphqlOperation(
+          onDeleteTodo
+          //  { filter: { userId: { eq: sub } } }
+        )
       ).subscribe({
         next: ({ provider, value }) => {
-          console.log("value", value);
-          // setTodos((prev) => [...prev, value.data.onDeleteTodo]);
+          let data = value.data.onDeleteTodo;
+          if (data.userId === sub) {
+            setTodos((prev) => prev.filter((item) => item.id !== data.id));
+          }
         },
         error: (error) => console.warn(error),
       });
