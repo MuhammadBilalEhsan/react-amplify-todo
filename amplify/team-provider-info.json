@@ -24,7 +24,7 @@
       "function": {
         "todo": {
           "deploymentBucketName": "amplify-reactamplifytodo-dev-185249-deployment",
-          "s3Key": "amplify-builds/todo-793957427a594d5a6843-build.zip"
+          "s3Key": "amplify-builds/todo-46685170526a7a774e6e-build.zip"
         }
       }
     }

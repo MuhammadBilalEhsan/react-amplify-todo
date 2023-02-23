@@ -15,6 +15,18 @@
     },
     "s3Key": {
       "Type": "String"
+    },
+    "apireactamplifytodoGraphQLAPIIdOutput": {
+      "Type": "String",
+      "Default": "apireactamplifytodoGraphQLAPIIdOutput"
+    },
+    "apireactamplifytodoGraphQLAPIEndpointOutput": {
+      "Type": "String",
+      "Default": "apireactamplifytodoGraphQLAPIEndpointOutput"
+    },
+    "apireactamplifytodoGraphQLAPIKeyOutput": {
+      "Type": "String",
+      "Default": "apireactamplifytodoGraphQLAPIKeyOutput"
     }
   },
   "Conditions": {
@@ -69,6 +81,41 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
+            },
+            "API_REACTAMPLIFYTODO_TODOTABLE_NAME": {
+              "Fn::ImportValue": {
+                "Fn::Sub": "${apireactamplifytodoGraphQLAPIIdOutput}:GetAtt:TodoTable:Name"
+              }
+            },
+            "API_REACTAMPLIFYTODO_TODOTABLE_ARN": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:aws:dynamodb:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":table/",
+                  {
+                    "Fn::ImportValue": {
+                      "Fn::Sub": "${apireactamplifytodoGraphQLAPIIdOutput}:GetAtt:TodoTable:Name"
+                    }
+                  }
+                ]
+              ]
+            },
+            "API_REACTAMPLIFYTODO_GRAPHQLAPIIDOUTPUT": {
+              "Ref": "apireactamplifytodoGraphQLAPIIdOutput"
+            },
+            "API_REACTAMPLIFYTODO_GRAPHQLAPIENDPOINTOUTPUT": {
+              "Ref": "apireactamplifytodoGraphQLAPIEndpointOutput"
+            },
+            "API_REACTAMPLIFYTODO_GRAPHQLAPIKEYOUTPUT": {
+              "Ref": "apireactamplifytodoGraphQLAPIKeyOutput"
             }
           }
         },
@@ -160,6 +207,155 @@
                   }
                 ]
               }
+            }
+          ]
+        }
+      }
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "appsync:GraphQL"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:appsync:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":apis/",
+                      {
+                        "Ref": "apireactamplifytodoGraphQLAPIIdOutput"
+                      },
+                      "/types/Query/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:appsync:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":apis/",
+                      {
+                        "Ref": "apireactamplifytodoGraphQLAPIIdOutput"
+                      },
+                      "/types/Mutation/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:appsync:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":apis/",
+                      {
+                        "Ref": "apireactamplifytodoGraphQLAPIIdOutput"
+                      },
+                      "/types/Subscription/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Put*",
+                "dynamodb:Create*",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:dynamodb:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":table/",
+                      {
+                        "Fn::ImportValue": {
+                          "Fn::Sub": "${apireactamplifytodoGraphQLAPIIdOutput}:GetAtt:TodoTable:Name"
+                        }
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:dynamodb:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":table/",
+                      {
+                        "Fn::ImportValue": {
+                          "Fn::Sub": "${apireactamplifytodoGraphQLAPIIdOutput}:GetAtt:TodoTable:Name"
+                        }
+                      },
+                      "/index/*"
+                    ]
+                  ]
+                }
+              ]
             }
           ]
         }

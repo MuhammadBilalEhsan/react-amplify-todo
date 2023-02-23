@@ -1,5 +1,5 @@
 {
-  "key1": "value1",
-  "key2": "value2",
-  "key3": "value3"
+  "typeName": "Mutation",
+  "fieldName": "deleteAllTodo",
+  "arguments": { "userId": "6c203454-e4e5-4539-8a23-6b459795dcea" }
 }

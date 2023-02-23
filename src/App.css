@@ -25,7 +25,7 @@
   justify-content: center;
   align-items: center;
   min-height: 60px;
-  padding: 0 40px;
+  padding: 0 25px;
 }
 .name {
   flex-grow: 1;
@@ -45,8 +45,9 @@
 .main {
   display: flex;
   flex-direction: column;
-  max-width: 700px;
+  max-width: 750px;
   margin: 0 auto;
+  padding: 0 25px;
 }
 .input {
   width: 100%;
@@ -85,6 +86,16 @@
 .create-update {
   background: #3380f0;
   min-width: 127px;
+}
+.cancel-edit-btn {
+  outline: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  background: #5a5959;
+  padding: 0px 5px;
+  border-radius: 6px;
+  color: #fff;
 }
 .no-data {
   margin: 0 auto;

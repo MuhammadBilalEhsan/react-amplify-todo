@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { deleteTodo } from "./graphql/mutations";
 
-const Item = ({ todo, index, setFormState, formState }) => {
+const Item = ({ todo, index, setFormState, formState, handleClear }) => {
   const [deleteLoad, setDeleteLoad] = useState(false);
   let wrapperStyle = {
     width: "20px",
@@ -20,7 +20,6 @@ const Item = ({ todo, index, setFormState, formState }) => {
           input: { id },
         })
       );
-      console.log("res", res);
       setDeleteLoad(false);
     } catch (err) {
       setDeleteLoad(false);
@@ -47,7 +46,7 @@ const Item = ({ todo, index, setFormState, formState }) => {
             {moment(todo.updatedAt).fromNow()}
           </span>
         </div>
-        {formState.id !== todo.id && (
+        {formState.id !== todo.id ? (
           <div style={{ display: "flex" }}>
             <div style={wrapperStyle}>
               {deleteLoad ? (
@@ -64,6 +63,14 @@ const Item = ({ todo, index, setFormState, formState }) => {
               <MdEdit color="#3380f0" fontSize="1.3rem" />
             </div>
           </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="cancel-edit-btn"
+          >
+            Cancel
+          </button>
         )}
       </div>
     </div>

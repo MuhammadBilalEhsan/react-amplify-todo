@@ -62,7 +62,7 @@ const App = ({ signOut, user }) => {
     try {
       setDeleteLoad(true);
 
-      // setDeleteLoad(false);
+      setDeleteLoad(false);
     } catch (err) {
       setDeleteLoad(false);
       console.log("error creating todo:", err);
@@ -77,7 +77,6 @@ const App = ({ signOut, user }) => {
             input: { id: formState.id, name: formState.name.trim() },
           })
         );
-        console.log("res", res);
       } else {
         const res = await API.graphql(
           graphqlOperation(createTodo, {
@@ -182,7 +181,7 @@ const App = ({ signOut, user }) => {
           <input type="submit" hidden />
         </form>
         <div className="actions">
-          {isUpdate && (
+          {/* {isUpdate && (
             <button
               type="button"
               onClick={handleClear}
@@ -190,7 +189,7 @@ const App = ({ signOut, user }) => {
             >
               Cancel
             </button>
-          )}
+          )} */}
           <button
             type="button"
             onClick={deleteAll}
@@ -220,6 +219,7 @@ const App = ({ signOut, user }) => {
               index={index}
               setFormState={setFormState}
               formState={formState}
+              handleClear={handleClear}
             />
           ))
         ) : (

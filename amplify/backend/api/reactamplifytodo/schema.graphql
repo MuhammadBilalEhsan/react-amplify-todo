@@ -8,3 +8,12 @@ type Todo @model {
   name: String!
   userId: ID!
 }
+
+type Mutation {
+  deleteAllTodo(userId: ID!): [Todo] @function(name: "todo-${env}")
+}
+
+type Subscription {
+  onDeleteAllTodo(userId: ID): [Todo]
+    @aws_subscribe(mutations: ["deleteAllTodo"])
+}
