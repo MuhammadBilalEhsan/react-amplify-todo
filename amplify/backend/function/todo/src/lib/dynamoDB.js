@@ -1,38 +1,40 @@
 const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-const deleteBatch = async (userId, tableName) => {
-  console.log("tableName:", tableName);
-  console.log("userId:", userId);
-  const params = {
-    TableName: tableName,
-    Key: { userId },
-  };
-
+const deleteBatch = async (userId, TableName) => {
   try {
-    while (true) {
-      const { Items } = await docClient.scan(params).promise();
-      console.log("Items:", Items);
-      if (Items.length === 0) return [];
+    const params = {
+      TableName,
+      IndexName: "byUserId",
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+    };
 
-      const batchParams = {
-        RequestItems: {
-          [tableName]: Items.map(({ userId, createdAt }) => {
-            console.log("Deleting item:", { userId, createdAt });
-            return {
-              DeleteRequest: { Key: { userId, createdAt } },
-            };
-          }),
-        },
-      };
-      console.log("batchParams:", batchParams);
+    const res = await docClient.query(params).promise();
 
-      await docClient.batchWrite(batchParams).promise();
+    const items = res?.Items || [];
+
+    console.log("items", items);
+
+    if (items?.length) {
+      await docClient
+        .batchWrite({
+          RequestItems: {
+            [TableName]: items?.map((item) => ({
+              DeleteRequest: {
+                Key: { id: item?.id },
+              },
+            })),
+          },
+        })
+        .promise();
     }
+    return items;
   } catch (err) {
-    console.error("Error deleting objects:", err);
+    console.log(err);
     throw new Error(err);
   }
 };
-
 module.exports = { deleteBatch };

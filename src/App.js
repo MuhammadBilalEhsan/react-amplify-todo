@@ -3,13 +3,14 @@ import { Loader, withAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
-import { createTodo, updateTodo } from "./graphql/mutations";
-import { listTodos } from "./graphql/queries";
+import { createTodo, deleteAllTodo, updateTodo } from "./graphql/mutations";
+import { getTodoByUserId } from "./graphql/queries";
 
 // import awsExports from "./aws-exports";
 import "./App.css";
 import {
   onCreateTodo,
+  onDeleteAllTodo,
   onDeleteTodo,
   onUpdateTodo,
 } from "./graphql/subscriptions";
@@ -41,11 +42,11 @@ const App = ({ signOut, user }) => {
   const fetchTodos = async () => {
     try {
       const todoData = await API.graphql(
-        graphqlOperation(listTodos, {
-          filter: { userId: { eq: sub } },
+        graphqlOperation(getTodoByUserId, {
+          userId: sub,
         })
       );
-      const todos = todoData.data.listTodos.items;
+      const todos = todoData.data.getTodoByUserId.items;
       setTodos(todos);
       setLoading(false);
     } catch (err) {
@@ -57,11 +58,15 @@ const App = ({ signOut, user }) => {
   };
   let isUpdate = formState.id;
   let disableSubmit = !formState.name.trim() || submitLoad;
+  const deleteAllDisabled = !todos.length || isUpdate;
 
   const deleteAll = async () => {
     try {
       setDeleteLoad(true);
-
+      const res = await API.graphql(
+        graphqlOperation(deleteAllTodo, { userId: sub })
+      );
+      console.log("res", res);
       setDeleteLoad(false);
     } catch (err) {
       setDeleteLoad(false);
@@ -70,24 +75,26 @@ const App = ({ signOut, user }) => {
   };
   const handleSubmit = async () => {
     try {
-      setSubmitLoad(true);
-      if (isUpdate) {
-        const res = await API.graphql(
-          graphqlOperation(updateTodo, {
-            input: { id: formState.id, name: formState.name.trim() },
-          })
-        );
-      } else {
-        const res = await API.graphql(
-          graphqlOperation(createTodo, {
-            input: { name: formState.name.trim(), userId: sub },
-          })
-        );
+      if (!disableSubmit) {
+        setSubmitLoad(true);
+        if (isUpdate) {
+          const res = await API.graphql(
+            graphqlOperation(updateTodo, {
+              input: { id: formState.id, name: formState.name.trim() },
+            })
+          );
+        } else {
+          const res = await API.graphql(
+            graphqlOperation(createTodo, {
+              input: { name: formState.name.trim(), userId: sub },
+            })
+          );
 
-        // setTodos([...todos, res.data.createTodo]);
+          // setTodos([...todos, res.data.createTodo]);
+        }
+        handleClear();
+        setSubmitLoad(false);
       }
-      handleClear();
-      setSubmitLoad(false);
     } catch (err) {
       setSubmitLoad(false);
       console.log("error creating todo:", err);
@@ -99,6 +106,7 @@ const App = ({ signOut, user }) => {
       let onCreateTodoSubs;
       let onDeleteTodoSubs;
       let onUpdateTodoSubs;
+      let onDeleteAllTodoSubs;
 
       onCreateTodoSubs = API.graphql(
         graphqlOperation(
@@ -133,7 +141,7 @@ const App = ({ signOut, user }) => {
       onDeleteTodoSubs = API.graphql(
         graphqlOperation(
           onDeleteTodo
-          //  { filter: { userId: { eq: sub } } }
+          // { filter: { userId: { eq: sub } } }
         )
       ).subscribe({
         next: ({ provider, value }) => {
@@ -144,11 +152,25 @@ const App = ({ signOut, user }) => {
         },
         error: (error) => console.warn(error),
       });
+      onDeleteAllTodoSubs = API.graphql(
+        graphqlOperation(onDeleteAllTodo) // { userId: sub }
+      ).subscribe({
+        next: ({ provider, value }) => {
+          let data = value.data.onDeleteAllTodo;
+          const condition = data[0].userId === sub;
+          console.log("condition:", condition);
+          if (condition) {
+            setTodos([]);
+          }
+        },
+        error: (error) => console.warn(error),
+      });
 
       return () => {
         if (onCreateTodoSubs) return onCreateTodoSubs.unsubscribe();
         if (onUpdateTodoSubs) return onUpdateTodoSubs.unsubscribe();
         if (onDeleteTodoSubs) return onDeleteTodoSubs.unsubscribe();
+        if (onDeleteAllTodoSubs) return onDeleteAllTodoSubs.unsubscribe();
       };
     }
   }, [user]);
@@ -181,26 +203,22 @@ const App = ({ signOut, user }) => {
           <input type="submit" hidden />
         </form>
         <div className="actions">
-          {/* {isUpdate && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="act-button delete"
-            >
-              Cancel
-            </button>
-          )} */}
           <button
             type="button"
             onClick={deleteAll}
-            className="act-button delete"
+            className={`act-button delete ${
+              deleteAllDisabled ? "disabled" : ""
+            }`}
+            disabled={deleteAllDisabled}
           >
             {deleteLoad ? <Loader /> : "Delete All"}
           </button>
           <button
             disabled={disableSubmit}
             onClick={handleSubmit}
-            className="act-button create-update"
+            className={`act-button create-update ${
+              disableSubmit ? "disabled" : ""
+            }`}
           >
             {submitLoad ? (
               <Loader />

@@ -30,3 +30,29 @@ export const listTodos = /* GraphQL */ `
     }
   }
 `;
+export const getTodoByUserId = /* GraphQL */ `
+  query GetTodoByUserId(
+    $userId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelTodoFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    getTodoByUserId(
+      userId: $userId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        userId
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

@@ -6,7 +6,7 @@ input AMPLIFY {
 type Todo @model {
   id: ID!
   name: String!
-  userId: ID!
+  userId: ID! @index(name: "byUserId", queryField: "getTodoByUserId")
 }
 
 type Mutation {
