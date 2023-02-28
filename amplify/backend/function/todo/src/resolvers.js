@@ -1,4 +1,4 @@
-const { deleteAllTodo } = require("./heper/deleteAllTodo");
+const { deleteAllTodo } = require("./helper/deleteAllTodo");
 
 exports.resolvers = {
   Mutation: {

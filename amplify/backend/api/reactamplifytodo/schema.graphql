@@ -3,17 +3,27 @@
 input AMPLIFY {
   globalAuthRule: AuthRule = { allow: public }
 } # FOR TESTING ONLY!
-type Todo @model {
+type Todo
+  @model(
+    mutations: {
+      create: "createTodo"
+      update: "updateTodo"
+      delete: "deleteTodo"
+    }
+    subscriptions: null
+  ) {
   id: ID!
   name: String!
   userId: ID! @index(name: "byUserId", queryField: "getTodoByUserId")
 }
 
 type Mutation {
-  deleteAllTodo(userId: ID!): [Todo] @function(name: "todo-${env}")
+  deleteAllTodo(userId: ID!): Todo @function(name: "todo-${env}")
 }
 
 type Subscription {
-  onDeleteAllTodo(userId: ID): [Todo]
-    @aws_subscribe(mutations: ["deleteAllTodo"])
+  onCreateTodo(userId: ID): Todo @aws_subscribe(mutations: ["createTodo"])
+  onUpdateTodo(userId: ID): Todo @aws_subscribe(mutations: ["updateTodo"])
+  onDeleteTodo(userId: ID): Todo @aws_subscribe(mutations: ["deleteTodo"])
+  onDeleteAllTodo(userId: ID): Todo @aws_subscribe(mutations: ["deleteAllTodo"])
 }

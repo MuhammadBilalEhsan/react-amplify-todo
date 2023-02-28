@@ -1,20 +1,9 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onDeleteAllTodo = /* GraphQL */ `
-  subscription OnDeleteAllTodo($userId: ID) {
-    onDeleteAllTodo(userId: $userId) {
-      id
-      name
-      userId
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const onCreateTodo = /* GraphQL */ `
-  subscription OnCreateTodo($filter: ModelSubscriptionTodoFilterInput) {
-    onCreateTodo(filter: $filter) {
+  subscription OnCreateTodo($userId: ID) {
+    onCreateTodo(userId: $userId) {
       id
       name
       userId
@@ -24,8 +13,8 @@ export const onCreateTodo = /* GraphQL */ `
   }
 `;
 export const onUpdateTodo = /* GraphQL */ `
-  subscription OnUpdateTodo($filter: ModelSubscriptionTodoFilterInput) {
-    onUpdateTodo(filter: $filter) {
+  subscription OnUpdateTodo($userId: ID) {
+    onUpdateTodo(userId: $userId) {
       id
       name
       userId
@@ -35,8 +24,19 @@ export const onUpdateTodo = /* GraphQL */ `
   }
 `;
 export const onDeleteTodo = /* GraphQL */ `
-  subscription OnDeleteTodo($filter: ModelSubscriptionTodoFilterInput) {
-    onDeleteTodo(filter: $filter) {
+  subscription OnDeleteTodo($userId: ID) {
+    onDeleteTodo(userId: $userId) {
+      id
+      name
+      userId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteAllTodo = /* GraphQL */ `
+  subscription OnDeleteAllTodo($userId: ID) {
+    onDeleteAllTodo(userId: $userId) {
       id
       name
       userId

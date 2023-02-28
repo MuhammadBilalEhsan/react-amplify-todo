@@ -1,4 +1,3 @@
-/* src/App.js */
 import { Loader, withAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { API, graphqlOperation } from "aws-amplify";
@@ -6,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { createTodo, deleteAllTodo, updateTodo } from "./graphql/mutations";
 import { getTodoByUserId } from "./graphql/queries";
 
-// import awsExports from "./aws-exports";
 import "./App.css";
 import {
   onCreateTodo,
@@ -15,7 +13,6 @@ import {
   onUpdateTodo,
 } from "./graphql/subscriptions";
 import Item from "./Item";
-// Amplify.configure(awsExports);
 
 const initialState = {
   id: "",
@@ -24,7 +21,7 @@ const initialState = {
 
 const App = ({ signOut, user }) => {
   const [formState, setFormState] = useState(initialState);
-  const [todos, setTodos] = useState([]);
+  const [todo, setTodo] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitLoad, setSubmitLoad] = useState(false);
   const [deleteLoad, setDeleteLoad] = useState(false);
@@ -46,11 +43,11 @@ const App = ({ signOut, user }) => {
           userId: sub,
         })
       );
-      const todos = todoData.data.getTodoByUserId.items;
-      setTodos(todos);
+      const todo = todoData.data.getTodoByUserId.items;
+      setTodo(todo);
       setLoading(false);
     } catch (err) {
-      console.log("error fetching todos");
+      console.log("error fetching todo");
     }
   };
   const handleClear = () => {
@@ -58,15 +55,12 @@ const App = ({ signOut, user }) => {
   };
   let isUpdate = formState.id;
   let disableSubmit = !formState.name.trim() || submitLoad;
-  const deleteAllDisabled = !todos.length || isUpdate;
+  const deleteAllDisabled = !todo.length || isUpdate;
 
   const deleteAll = async () => {
     try {
       setDeleteLoad(true);
-      const res = await API.graphql(
-        graphqlOperation(deleteAllTodo, { userId: sub })
-      );
-      console.log("res", res);
+      await API.graphql(graphqlOperation(deleteAllTodo, { userId: sub }));
       setDeleteLoad(false);
     } catch (err) {
       setDeleteLoad(false);
@@ -78,19 +72,17 @@ const App = ({ signOut, user }) => {
       if (!disableSubmit) {
         setSubmitLoad(true);
         if (isUpdate) {
-          const res = await API.graphql(
+          await API.graphql(
             graphqlOperation(updateTodo, {
               input: { id: formState.id, name: formState.name.trim() },
             })
           );
         } else {
-          const res = await API.graphql(
+          await API.graphql(
             graphqlOperation(createTodo, {
               input: { name: formState.name.trim(), userId: sub },
             })
           );
-
-          // setTodos([...todos, res.data.createTodo]);
         }
         handleClear();
         setSubmitLoad(false);
@@ -108,60 +100,47 @@ const App = ({ signOut, user }) => {
       let onUpdateTodoSubs;
       let onDeleteAllTodoSubs;
 
+      const commonCondition = {
+        userId: sub,
+      };
+
       onCreateTodoSubs = API.graphql(
-        graphqlOperation(
-          onCreateTodo
-          //  { filter: { userId: { eq: sub } } }
-        )
+        graphqlOperation(onCreateTodo, commonCondition)
       ).subscribe({
         next: ({ provider, value }) => {
           let data = value.data.onCreateTodo;
-          if (data.userId === sub) {
-            setTodos((prev) => [...prev, data]);
-          }
+
+          setTodo((prev) => [...prev, data]);
         },
         error: (error) => console.warn(error),
       });
       onUpdateTodoSubs = API.graphql(
-        graphqlOperation(
-          onUpdateTodo
-          //  { filter: { userId: { eq: sub } } }
-        )
+        graphqlOperation(onUpdateTodo, commonCondition)
       ).subscribe({
         next: ({ provider, value }) => {
           let data = value.data.onUpdateTodo;
-          if (data.userId === sub) {
-            setTodos((prev) =>
-              prev.map((item) => (item.id === data.id ? data : item))
-            );
-          }
+          setTodo((prev) =>
+            prev.map((item) => (item.id === data.id ? data : item))
+          );
         },
         error: (error) => console.warn(error),
       });
       onDeleteTodoSubs = API.graphql(
-        graphqlOperation(
-          onDeleteTodo
-          // { filter: { userId: { eq: sub } } }
-        )
+        graphqlOperation(onDeleteTodo, commonCondition)
       ).subscribe({
         next: ({ provider, value }) => {
           let data = value.data.onDeleteTodo;
-          if (data.userId === sub) {
-            setTodos((prev) => prev.filter((item) => item.id !== data.id));
-          }
+          setTodo((prev) => prev.filter((item) => item.id !== data.id));
         },
         error: (error) => console.warn(error),
       });
       onDeleteAllTodoSubs = API.graphql(
-        graphqlOperation(onDeleteAllTodo) // { userId: sub }
+        graphqlOperation(onDeleteAllTodo, commonCondition)
       ).subscribe({
         next: ({ provider, value }) => {
-          let data = value.data.onDeleteAllTodo;
-          const condition = data[0].userId === sub;
-          console.log("condition:", condition);
-          if (condition) {
-            setTodos([]);
-          }
+          // let data = value.data.onDeleteAllTodo;
+
+          setTodo([]);
         },
         error: (error) => console.warn(error),
       });
@@ -179,9 +158,11 @@ const App = ({ signOut, user }) => {
     <div className="App">
       <div className="curved">
         <nav className="header">
-          <span className="name">Hi {user.username}</span>
+          <span className="name">
+            Hi <span className="user-name"> {user.username}</span>
+          </span>
           <button type="button" className="sign-out" onClick={signOut}>
-            SignOut
+            Sign Out
           </button>
         </nav>
         Todo List
@@ -229,8 +210,8 @@ const App = ({ signOut, user }) => {
         </div>
         {loading ? (
           <Loader style={{ margin: "0 auto" }} />
-        ) : todos.length ? (
-          todos.map((todo, index) => (
+        ) : todo.length ? (
+          todo.map((todo, index) => (
             <Item
               key={todo.id ? todo.id : index}
               todo={todo}
